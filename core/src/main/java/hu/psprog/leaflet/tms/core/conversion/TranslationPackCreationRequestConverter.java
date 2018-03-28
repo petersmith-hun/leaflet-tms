@@ -1,8 +1,8 @@
 package hu.psprog.leaflet.tms.core.conversion;
 
-import hu.psprog.leaflet.tms.core.domain.TranslationDefinition;
-import hu.psprog.leaflet.tms.core.domain.TranslationPack;
-import hu.psprog.leaflet.tms.core.domain.TranslationPackCreationRequest;
+import hu.psprog.leaflet.translation.api.domain.TranslationDefinition;
+import hu.psprog.leaflet.translation.api.domain.TranslationPack;
+import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

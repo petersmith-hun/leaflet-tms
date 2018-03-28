@@ -1,12 +1,12 @@
 package hu.psprog.leaflet.tms.core.service.impl;
 
 import hu.psprog.leaflet.tms.core.dao.TranslationPackDAO;
-import hu.psprog.leaflet.tms.core.domain.TranslationPack;
-import hu.psprog.leaflet.tms.core.domain.TranslationPackCreationRequest;
-import hu.psprog.leaflet.tms.core.domain.TranslationPackMetaInfo;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackCreationException;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
 import hu.psprog.leaflet.tms.core.service.TranslationManagementService;
+import hu.psprog.leaflet.translation.api.domain.TranslationPack;
+import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
+import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;

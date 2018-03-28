@@ -1,6 +1,6 @@
 package hu.psprog.leaflet.tms.core.exception;
 
-import hu.psprog.leaflet.tms.core.domain.TranslationPackCreationRequest;
+import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
 
 /**
  * @author Peter Smith

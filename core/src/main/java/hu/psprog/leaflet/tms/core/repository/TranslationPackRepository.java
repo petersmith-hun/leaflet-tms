@@ -1,6 +1,6 @@
 package hu.psprog.leaflet.tms.core.repository;
 
-import hu.psprog.leaflet.tms.core.domain.TranslationPack;
+import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

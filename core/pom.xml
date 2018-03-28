@@ -28,6 +28,10 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>translation-api</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -1,11 +1,11 @@
 package hu.psprog.leaflet.tms.web.rest.controller;
 
-import hu.psprog.leaflet.tms.core.domain.TranslationPack;
-import hu.psprog.leaflet.tms.core.domain.TranslationPackCreationRequest;
-import hu.psprog.leaflet.tms.core.domain.TranslationPackMetaInfo;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackCreationException;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
 import hu.psprog.leaflet.tms.core.service.TranslationManagementService;
+import hu.psprog.leaflet.translation.api.domain.TranslationPack;
+import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
+import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

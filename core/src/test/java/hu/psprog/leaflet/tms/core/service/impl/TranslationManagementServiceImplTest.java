@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.tms.core.service.impl;
 
 import hu.psprog.leaflet.tms.core.dao.TranslationPackDAO;
-import hu.psprog.leaflet.tms.core.domain.TranslationPack;
+import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

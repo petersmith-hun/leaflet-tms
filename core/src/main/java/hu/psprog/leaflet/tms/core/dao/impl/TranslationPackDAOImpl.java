@@ -1,8 +1,8 @@
 package hu.psprog.leaflet.tms.core.dao.impl;
 
 import hu.psprog.leaflet.tms.core.dao.TranslationPackDAO;
-import hu.psprog.leaflet.tms.core.domain.TranslationPack;
 import hu.psprog.leaflet.tms.core.repository.TranslationPackRepository;
+import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

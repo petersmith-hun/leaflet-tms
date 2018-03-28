@@ -35,6 +35,9 @@
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm z</maven.build.timestamp.format>
 
+        <!-- leaflet internal versions -->
+        <leaflet-translation-adapter.version>1.0.0</leaflet-translation-adapter.version>
+
         <!-- Spring versions -->
         <spring.boot.version>1.5.4.RELEASE</spring.boot.version>
         <spring.framework.version>4.3.9.RELEASE</spring.framework.version>
@@ -56,6 +59,13 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- leaflet internal dependencies -->
+            <dependency>
+                <groupId>hu.psprog.leaflet</groupId>
+                <artifactId>translation-api</artifactId>
+                <version>${leaflet-translation-adapter.version}</version>
+            </dependency>
 
             <!-- logging -->
             <dependency>
