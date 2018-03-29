@@ -11,6 +11,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
+ * Converts {@link TranslationPackCreationRequest} to {@link TranslationPack}.
+ * Defaults set:
+ *  - id: random UUID
+ *  - enabled: every packs are created with enabled status by default
+ *  - created: current time
+ *
  * @author Peter Smith
  */
 @Component

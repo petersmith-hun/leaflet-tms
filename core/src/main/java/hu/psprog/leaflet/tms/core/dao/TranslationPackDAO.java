@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ * DAO interface for {@link TranslationPack} persistence operations.
+ *
  * @author Peter Smith
  */
 public interface TranslationPackDAO {

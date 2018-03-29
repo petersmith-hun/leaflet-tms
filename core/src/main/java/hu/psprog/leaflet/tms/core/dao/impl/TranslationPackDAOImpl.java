@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ * Implementation of {@link TranslationPackDAO}.
+ *
  * @author Peter Smith
  */
 @Component

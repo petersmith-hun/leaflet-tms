@@ -3,6 +3,8 @@ package hu.psprog.leaflet.tms.core.exception;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
 
 /**
+ * Exception to throw when a translation pack could not be created.
+ *
  * @author Peter Smith
  */
 public class TranslationPackCreationException extends Exception {

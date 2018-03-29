@@ -20,6 +20,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
+ * Implementation of {@link TranslationManagementService}.
+ *
  * @author Peter Smith
  */
 @Service
