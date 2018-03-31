@@ -35,6 +35,9 @@
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm z</maven.build.timestamp.format>
 
+        <!-- leaflet internal versions -->
+        <leaflet-translation-adapter.version>1.0.0</leaflet-translation-adapter.version>
+
         <!-- Spring versions -->
         <spring.boot.version>1.5.4.RELEASE</spring.boot.version>
         <spring.framework.version>4.3.9.RELEASE</spring.framework.version>
@@ -44,6 +47,7 @@
         <slf4j.version>1.7.25</slf4j.version>
         <commons.lang.version>3.6</commons.lang.version>
         <jackson.version>2.8.9</jackson.version>
+        <hibernate.validator.version>5.2.4.Final</hibernate.validator.version>
 
         <!-- test framework versions -->
         <junit.version>4.12</junit.version>
@@ -55,6 +59,13 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- leaflet internal dependencies -->
+            <dependency>
+                <groupId>hu.psprog.leaflet</groupId>
+                <artifactId>translation-api</artifactId>
+                <version>${leaflet-translation-adapter.version}</version>
+            </dependency>
 
             <!-- logging -->
             <dependency>
@@ -109,6 +120,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons.lang.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate.validator.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
