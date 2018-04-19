@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
-            <artifactId>translation-api</artifactId>
+            <artifactId>tms-rest-api</artifactId>
         </dependency>
     </dependencies>
 
