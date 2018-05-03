@@ -3,6 +3,9 @@ package hu.psprog.leaflet.tms.web.rest.controller;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackCreationException;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
 import hu.psprog.leaflet.tms.core.service.TranslationManagementService;
+import hu.psprog.leaflet.tms.web.exception.model.ErrorMessageResponse;
+import hu.psprog.leaflet.tms.web.exception.model.ValidationErrorMessageListResponse;
+import hu.psprog.leaflet.tms.web.exception.model.ValidationErrorMessageResponse;
 import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
@@ -12,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,9 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,8 +42,6 @@ public class TranslationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslationController.class);
 
     private static final String UNEXPECTED_EXCEPTION_OCCURRED = "Unexpected exception occurred";
-    private static final String MESSAGE = "message";
-    private static final String VALIDATION = "validation";
 
     private static final String PATH_PACK_ID = "/{packID}";
     private static final String PATH_STATUS = PATH_PACK_ID + "/status";
@@ -174,7 +172,7 @@ public class TranslationController {
      * @return exception message with HTTP status 404
      */
     @ExceptionHandler(TranslationPackNotFoundException.class)
-    ResponseEntity<Map<String, String>> retrievalExceptionHandler(TranslationPackNotFoundException exception) {
+    ResponseEntity<ErrorMessageResponse> retrievalExceptionHandler(TranslationPackNotFoundException exception) {
 
         LOGGER.error("Failed to retrieve translation pack.", exception);
 
@@ -188,15 +186,15 @@ public class TranslationController {
      * Exception handler translation pack creation exceptions.
      *
      * @param exception exception that has been thrown
-     * @return exception message with HTTP status 422
+     * @return exception message with HTTP status 409
      */
     @ExceptionHandler(TranslationPackCreationException.class)
-    ResponseEntity<Map<String, String>> creationExceptionHandler(TranslationPackCreationException exception) {
+    ResponseEntity<ErrorMessageResponse> creationExceptionHandler(TranslationPackCreationException exception) {
 
         LOGGER.error("Failed to store translation pack.", exception);
 
         return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .status(HttpStatus.CONFLICT)
                 .body(buildExceptionMessageForResponse(exception));
     }
 
@@ -207,7 +205,7 @@ public class TranslationController {
      * @return exception message with HTTP status 500
      */
     @ExceptionHandler
-    ResponseEntity<Map<String, String>> defaultExceptionHandler(Exception exception) {
+    ResponseEntity<ErrorMessageResponse> defaultExceptionHandler(Exception exception) {
 
         LOGGER.error(UNEXPECTED_EXCEPTION_OCCURRED, exception);
 
@@ -216,31 +214,32 @@ public class TranslationController {
                 .body(buildExceptionMessageForResponse());
     }
 
-    private Map<String, Object> buildValidationErrorMessage(TranslationPackCreationRequest creationRequest, BindingResult bindingResult) {
+    private ValidationErrorMessageListResponse buildValidationErrorMessage(TranslationPackCreationRequest creationRequest, BindingResult bindingResult) {
 
         LOGGER.warn("Failed to validate translation pack creation request [{}].", creationRequest);
-        Map<String, Object> message = new HashMap<>();
-        message.put(MESSAGE, "Validation failure");
-        message.put(VALIDATION, bindingResult.getFieldErrors().stream()
-                .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
 
-        return message;
+        return ValidationErrorMessageListResponse.getBuilder()
+                .withValidation(bindingResult.getFieldErrors().stream()
+                        .map(fieldError -> ValidationErrorMessageResponse.getExtendedBuilder()
+                                .withField(fieldError.getField())
+                                .withMessage(fieldError.getDefaultMessage())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
     }
 
-    private Map<String, String> buildExceptionMessageForResponse() {
+    private ErrorMessageResponse buildExceptionMessageForResponse() {
 
-        Map<String, String> message = new HashMap<>();
-        message.put(MESSAGE, UNEXPECTED_EXCEPTION_OCCURRED);
-
-        return message;
+        return ErrorMessageResponse.getBuilder()
+                .withMessage(UNEXPECTED_EXCEPTION_OCCURRED)
+                .build();
     }
 
-    private Map<String, String> buildExceptionMessageForResponse(Exception exception) {
+    private ErrorMessageResponse buildExceptionMessageForResponse(Exception exception) {
 
-        Map<String, String> message = new HashMap<>();
-        message.put(MESSAGE, exception.getMessage());
-
-        return message;
+        return ErrorMessageResponse.getBuilder()
+                .withMessage(exception.getMessage())
+                .build();
     }
 
     private URI createURI(TranslationPack translationPack) {

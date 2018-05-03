@@ -3,6 +3,9 @@ package hu.psprog.leaflet.tms.web.rest.controller;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackCreationException;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
 import hu.psprog.leaflet.tms.core.service.TranslationManagementService;
+import hu.psprog.leaflet.tms.web.exception.model.ErrorMessageResponse;
+import hu.psprog.leaflet.tms.web.exception.model.ValidationErrorMessageListResponse;
+import hu.psprog.leaflet.tms.web.exception.model.ValidationErrorMessageResponse;
 import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
 import org.junit.Test;
@@ -17,9 +20,7 @@ import org.springframework.validation.FieldError;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -42,15 +43,12 @@ public class TranslationControllerTest {
     private static final TranslationPack TRANSLATION_PACK = TranslationPack.getPackBuilder().withId(PACK_ID).build();
     private static final String VIOLATED_FIELD = "field1";
     private static final String DEFAULT_MESSAGE = "violation message";
-    private static final Map<String, Object> EXPECTED_VALIDATION_ERROR_BODY = new HashMap<>();
-
-    static {
-        Map<String, Object> validation = new HashMap<>();
-        validation.put(VIOLATED_FIELD, DEFAULT_MESSAGE);
-
-        EXPECTED_VALIDATION_ERROR_BODY.put("message", "Validation failure");
-        EXPECTED_VALIDATION_ERROR_BODY.put("validation", validation);
-    }
+    private static final ValidationErrorMessageListResponse EXPECTED_VALIDATION_ERROR_BODY = ValidationErrorMessageListResponse.getBuilder()
+            .withValidation(Collections.singletonList(ValidationErrorMessageResponse.getExtendedBuilder()
+                    .withField(VIOLATED_FIELD)
+                    .withMessage(DEFAULT_MESSAGE)
+                    .build()))
+            .build();
 
     @Mock
     private TranslationManagementService translationManagementService;
@@ -155,32 +153,32 @@ public class TranslationControllerTest {
     public void shouldHandleRetrievalException() {
 
         // when
-        ResponseEntity<Map<String, String>> result = translationController.retrievalExceptionHandler(new TranslationPackNotFoundException(PACK_ID));
+        ResponseEntity<ErrorMessageResponse> result = translationController.retrievalExceptionHandler(new TranslationPackNotFoundException(PACK_ID));
 
         // then
         assertThat(result.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
-        assertThat(result.getBody().get("message"), equalTo(String.format("Requested translation pack [%s] not found", PACK_ID)));
+        assertThat(result.getBody().getMessage(), equalTo(String.format("Requested translation pack [%s] not found", PACK_ID)));
     }
 
     @Test
     public void shouldHandleCreationException() {
 
         // when
-        ResponseEntity<Map<String, String>> result = translationController.creationExceptionHandler(new TranslationPackCreationException(TRANSLATION_PACK_CREATION_REQUEST));
+        ResponseEntity<ErrorMessageResponse> result = translationController.creationExceptionHandler(new TranslationPackCreationException(TRANSLATION_PACK_CREATION_REQUEST));
 
         // then
-        assertThat(result.getStatusCode(), equalTo(HttpStatus.UNPROCESSABLE_ENTITY));
-        assertThat(result.getBody().get("message"), equalTo(String.format("Failed to create translation pack for request [%s]", TRANSLATION_PACK_CREATION_REQUEST)));
+        assertThat(result.getStatusCode(), equalTo(HttpStatus.CONFLICT));
+        assertThat(result.getBody().getMessage(), equalTo(String.format("Failed to create translation pack for request [%s]", TRANSLATION_PACK_CREATION_REQUEST)));
     }
 
     @Test
     public void shouldHandleUnknownException() {
 
         // when
-        ResponseEntity<Map<String, String>> result = translationController.defaultExceptionHandler(new RuntimeException("any other exception"));
+        ResponseEntity<ErrorMessageResponse> result = translationController.defaultExceptionHandler(new RuntimeException("any other exception"));
 
         // then
         assertThat(result.getStatusCode(), equalTo(HttpStatus.INTERNAL_SERVER_ERROR));
-        assertThat(result.getBody().get("message"), equalTo("Unexpected exception occurred"));
+        assertThat(result.getBody().getMessage(), equalTo("Unexpected exception occurred"));
     }
 }
