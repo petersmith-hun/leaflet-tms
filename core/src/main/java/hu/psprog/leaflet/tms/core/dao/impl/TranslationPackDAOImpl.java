@@ -36,12 +36,12 @@ public class TranslationPackDAOImpl implements TranslationPackDAO {
 
     @Override
     public boolean exists(UUID packID) {
-        return translationPackRepository.exists(packID);
+        return translationPackRepository.existsById(packID);
     }
 
     @Override
     public TranslationPack getByID(UUID packID) {
-        return translationPackRepository.findOne(packID);
+        return translationPackRepository.findById(packID).orElse(null);
     }
 
     @Override
@@ -52,13 +52,14 @@ public class TranslationPackDAOImpl implements TranslationPackDAO {
     @Override
     public void setStatus(UUID packID, boolean enabled) {
 
-        TranslationPack pack = translationPackRepository.findOne(packID);
-        pack.setEnabled(enabled);
-        translationPackRepository.save(pack);
+        translationPackRepository.findById(packID).ifPresent(pack -> {
+            pack.setEnabled(enabled);
+            translationPackRepository.save(pack);
+        });
     }
 
     @Override
     public void delete(UUID packID) {
-        translationPackRepository.delete(packID);
+        translationPackRepository.deleteById(packID);
     }
 }

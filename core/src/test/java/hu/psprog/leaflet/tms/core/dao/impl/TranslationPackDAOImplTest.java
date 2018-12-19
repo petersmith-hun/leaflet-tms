@@ -6,10 +6,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -64,7 +65,7 @@ public class TranslationPackDAOImplTest {
         translationPackDAO.exists(PACK_ID);
 
         // then
-        verify(translationPackRepository).exists(PACK_ID);
+        verify(translationPackRepository).existsById(PACK_ID);
     }
 
     @Test
@@ -74,7 +75,7 @@ public class TranslationPackDAOImplTest {
         translationPackDAO.getByID(PACK_ID);
 
         // then
-        verify(translationPackRepository).findOne(PACK_ID);
+        verify(translationPackRepository).findById(PACK_ID);
     }
 
     @Test
@@ -91,7 +92,7 @@ public class TranslationPackDAOImplTest {
     public void shouldSetStatus() {
 
         // given
-        given(translationPackRepository.findOne(PACK_ID)).willReturn(TRANSLATION_PACK);
+        given(translationPackRepository.findById(PACK_ID)).willReturn(Optional.of(TRANSLATION_PACK));
 
         // when
         translationPackDAO.setStatus(PACK_ID, true);
@@ -108,6 +109,6 @@ public class TranslationPackDAOImplTest {
         translationPackDAO.delete(PACK_ID);
 
         // then
-        verify(translationPackRepository).delete(PACK_ID);
+        verify(translationPackRepository).deleteById(PACK_ID);
     }
 }

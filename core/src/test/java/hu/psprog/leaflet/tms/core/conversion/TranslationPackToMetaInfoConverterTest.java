@@ -5,14 +5,14 @@ import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * Unit tests for {@link TranslationPackToMetaInfoConverter}.
