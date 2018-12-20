@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.convert.ConversionService;
 
 import java.sql.Timestamp;
@@ -199,7 +199,6 @@ public class TranslationManagementServiceImplTest {
 
         // given
         given(translationPackDAO.exists(PACK_ID)).willReturn(false);
-        given(translationPackDAO.getByID(PACK_ID)).willReturn(null);
 
         // when
         translationManagementService.changeStatus(PACK_ID);
