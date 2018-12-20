@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>tms</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.0</version>
+    <version>1.2.0-dev</version>
     <modules>
         <module>web</module>
         <module>core</module>
@@ -94,7 +94,7 @@
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito</artifactId>
+                <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
