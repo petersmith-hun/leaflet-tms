@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>tms</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.0-dev</version>
+    <version>1.2.1-dev</version>
     <modules>
         <module>web</module>
         <module>core</module>
