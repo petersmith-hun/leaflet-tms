@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>tms</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.2-dev</version>
+    <version>1.2.3-dev</version>
     <modules>
         <module>web</module>
         <module>core</module>
@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.4.RELEASE</version>
+        <version>2.3.4.RELEASE</version>
     </parent>
 
     <properties>
@@ -31,24 +31,25 @@
         <!-- compiler settings -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- maven settings -->
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm z</maven.build.timestamp.format>
 
         <!-- leaflet internal versions -->
-        <leaflet.rcp.version>1.5.4</leaflet.rcp.version>
+        <leaflet.rcp.version>1.5.5</leaflet.rcp.version>
 
         <!-- Spring versions -->
-        <spring.boot.version>2.2.4.RELEASE</spring.boot.version>
-        <spring.framework.version>5.2.3.RELEASE</spring.framework.version>
+        <spring.boot.version>2.3.4.RELEASE</spring.boot.version>
+        <spring.framework.version>5.2.9.RELEASE</spring.framework.version>
 
         <!-- other versions -->
         <logback.version>1.2.3</logback.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <commons.lang.version>3.9</commons.lang.version>
-        <jackson.version>2.10.2</jackson.version>
-        <hibernate.validator.version>6.1.2.Final</hibernate.validator.version>
+        <commons.lang.version>3.11</commons.lang.version>
+        <jackson.version>2.11.2</jackson.version>
+        <hibernate.validator.version>6.1.5.Final</hibernate.validator.version>
         <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
         <dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
 
@@ -174,6 +175,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
+                    <!--suppress UnresolvedMavenProperty -->
                     <argLine>${argLine.surefire}</argLine>
                 </configuration>
             </plugin>
