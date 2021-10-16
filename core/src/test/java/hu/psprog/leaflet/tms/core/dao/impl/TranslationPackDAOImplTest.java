@@ -2,11 +2,11 @@ package hu.psprog.leaflet.tms.core.dao.impl;
 
 import hu.psprog.leaflet.tms.core.repository.TranslationPackRepository;
 import hu.psprog.leaflet.translation.api.domain.TranslationPack;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TranslationPackDAOImplTest {
 
     private static final UUID PACK_ID = UUID.randomUUID();
