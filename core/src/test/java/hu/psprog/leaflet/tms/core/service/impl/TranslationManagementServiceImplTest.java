@@ -6,11 +6,12 @@ import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
 import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.ConversionService;
 
 import java.sql.Timestamp;
@@ -34,7 +35,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TranslationManagementServiceImplTest {
 
     private static final String PACK_SHARED = "shared";
@@ -125,14 +126,14 @@ public class TranslationManagementServiceImplTest {
         assertThat(result, equalTo(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED));
     }
 
-    @Test(expected = TranslationPackNotFoundException.class)
-    public void shouldGetPackThrowException() throws TranslationPackNotFoundException {
+    @Test
+    public void shouldGetPackThrowException() {
 
         // given
         given(translationPackDAO.exists(PACK_ID)).willReturn(false);
 
         // when
-        translationManagementService.getPack(PACK_ID);
+        Assertions.assertThrows(TranslationPackNotFoundException.class, () -> translationManagementService.getPack(PACK_ID));
 
         // then
         // exception expected
@@ -152,15 +153,15 @@ public class TranslationManagementServiceImplTest {
         assertThat(result, equalTo(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED));
     }
 
-    @Test(expected = TranslationPackCreationException.class)
-    public void shouldCreatePackThrowException() throws TranslationPackCreationException {
+    @Test
+    public void shouldCreatePackThrowException() {
 
         // given
         given(conversionService.convert(TRANSLATION_PACK_CREATION_REQUEST, TranslationPack.class)).willReturn(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED);
         given(translationPackDAO.save(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED)).willReturn(null);
 
         // when
-        translationManagementService.createPack(TRANSLATION_PACK_CREATION_REQUEST);
+        Assertions.assertThrows(TranslationPackCreationException.class, () -> translationManagementService.createPack(TRANSLATION_PACK_CREATION_REQUEST));
 
         // then
         // exception expected
@@ -194,14 +195,14 @@ public class TranslationManagementServiceImplTest {
         verify(translationPackDAO).setStatus(PACK_ID, false);
     }
 
-    @Test(expected = TranslationPackNotFoundException.class)
-    public void shouldChangeStatusThrowException() throws TranslationPackNotFoundException {
+    @Test
+    public void shouldChangeStatusThrowException() {
 
         // given
         given(translationPackDAO.exists(PACK_ID)).willReturn(false);
 
         // when
-        translationManagementService.changeStatus(PACK_ID);
+        Assertions.assertThrows(TranslationPackNotFoundException.class, () -> translationManagementService.changeStatus(PACK_ID));
 
         // then
         // exception expected
@@ -220,17 +221,17 @@ public class TranslationManagementServiceImplTest {
         verify(translationPackDAO).delete(PACK_ID);
     }
 
-    @Test(expected = TranslationPackNotFoundException.class)
-    public void shouldDeletePackThrowException() throws TranslationPackNotFoundException {
+    @Test
+    public void shouldDeletePackThrowException() {
 
         // given
         given(translationPackDAO.exists(PACK_ID)).willReturn(false);
 
         // when
-        translationManagementService.deletePack(PACK_ID);
+        Assertions.assertThrows(TranslationPackNotFoundException.class, () -> translationManagementService.deletePack(PACK_ID));
 
         // then
-        verify(translationPackDAO).delete(PACK_ID);
+        // exception expected
     }
 
     private static Timestamp prepareTimestamp(int day) {
