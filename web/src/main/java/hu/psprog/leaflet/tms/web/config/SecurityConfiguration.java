@@ -5,9 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+
+import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
 /**
  * Spring Web Security configuration.
@@ -20,6 +22,7 @@ public class SecurityConfiguration {
 
     private static final String ENDPOINT_TRANSLATION_PACKS = "/translations\\?packs=.+$";
     private static final String ENDPOINT_TRANSLATIONS = "/translations/**";
+    private static final String ENDPOINT_ACTUATOR = "/actuator/**";
 
     private static final String SCOPE_READ_TRANSLATIONS = "SCOPE_read:translations";
     private static final String SCOPE_WRITE_TRANSLATIONS = "SCOPE_write:translations";
@@ -28,23 +31,23 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
-                .authorizeRequests()
-                    .regexMatchers(HttpMethod.GET, ENDPOINT_TRANSLATION_PACKS)
-                        .permitAll()
-                    .mvcMatchers(HttpMethod.GET, ENDPOINT_TRANSLATIONS)
-                        .hasAuthority(SCOPE_READ_TRANSLATIONS)
-                    .mvcMatchers(ENDPOINT_TRANSLATIONS)
-                        .hasAuthority(SCOPE_WRITE_TRANSLATIONS)
-                    .and()
+                .authorizeHttpRequests(registry -> registry
+                        .requestMatchers(regexMatcher(HttpMethod.GET, ENDPOINT_TRANSLATION_PACKS))
+                            .permitAll()
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_ACTUATOR)
+                            .permitAll()
+                        .requestMatchers(HttpMethod.GET, ENDPOINT_TRANSLATIONS)
+                            .hasAuthority(SCOPE_READ_TRANSLATIONS)
+                        .requestMatchers(ENDPOINT_TRANSLATIONS)
+                            .hasAuthority(SCOPE_WRITE_TRANSLATIONS))
 
-                .csrf()
-                    .disable()
+                .csrf(AbstractHttpConfigurer::disable)
 
-                .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+                .oauth2ResourceServer(resourceServer -> resourceServer
+                        .jwt(jwtConfigurer -> {}))
 
                 .build();
     }

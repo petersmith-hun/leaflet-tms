@@ -1,14 +1,11 @@
 package hu.psprog.leaflet.tms.core.service.impl;
 
 import hu.psprog.leaflet.tms.core.dao.TranslationPackDAO;
+import hu.psprog.leaflet.tms.core.entity.TranslationPack;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackCreationException;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
 import hu.psprog.leaflet.tms.core.service.TranslationManagementService;
-import hu.psprog.leaflet.translation.api.domain.TranslationPack;
-import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
-import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -31,13 +28,11 @@ public class TranslationManagementServiceImpl implements TranslationManagementSe
             .comparing(TranslationPack::getPackName)
             .thenComparing(translationPack -> translationPack.getLocale().getLanguage());
 
-    private TranslationPackDAO translationPackDAO;
-    private ConversionService conversionService;
+    private final TranslationPackDAO translationPackDAO;
 
     @Autowired
-    public TranslationManagementServiceImpl(TranslationPackDAO translationPackDAO, ConversionService conversionService) {
+    public TranslationManagementServiceImpl(TranslationPackDAO translationPackDAO) {
         this.translationPackDAO = translationPackDAO;
-        this.conversionService = conversionService;
     }
 
     @Override
@@ -45,16 +40,13 @@ public class TranslationManagementServiceImpl implements TranslationManagementSe
 
         return translationPackDAO.findAllByPackNameIn(packs).stream()
                 .filter(TranslationPack::isEnabled)
-                .sorted(Comparator.comparing(TranslationPackMetaInfo::getCreated).reversed())
+                .sorted(Comparator.comparing(TranslationPack::getCreated).reversed())
                 .collect(Collectors.toCollection(() -> new TreeSet<>(TRANSLATION_PACK_COMPARATOR)));
     }
 
     @Override
-    public List<TranslationPackMetaInfo> retrievePackMetaInfo() {
-
-        return translationPackDAO.findAll().stream()
-                .map(translationPack -> conversionService.convert(translationPack, TranslationPackMetaInfo.class))
-                .collect(Collectors.toList());
+    public List<TranslationPack> retrieveAllTranslationPack() {
+        return translationPackDAO.findAll();
     }
 
     @Override
@@ -66,10 +58,9 @@ public class TranslationManagementServiceImpl implements TranslationManagementSe
     }
 
     @Override
-    public TranslationPack createPack(TranslationPackCreationRequest translationPackCreationRequest) throws TranslationPackCreationException {
+    public TranslationPack createPack(TranslationPack translationPackCreationRequest) throws TranslationPackCreationException {
 
-        TranslationPack translationPackToSave = conversionService.convert(translationPackCreationRequest, TranslationPack.class);
-        TranslationPack createdTranslationPack = translationPackDAO.save(translationPackToSave);
+        TranslationPack createdTranslationPack = translationPackDAO.save(translationPackCreationRequest);
 
         if (Objects.isNull(createdTranslationPack)) {
             throw new TranslationPackCreationException(translationPackCreationRequest);

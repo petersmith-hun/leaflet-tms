@@ -1,8 +1,8 @@
 package hu.psprog.leaflet.tms.core.dao.impl;
 
 import hu.psprog.leaflet.tms.core.dao.TranslationPackDAO;
+import hu.psprog.leaflet.tms.core.entity.TranslationPack;
 import hu.psprog.leaflet.tms.core.repository.TranslationPackRepository;
-import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Component
 public class TranslationPackDAOImpl implements TranslationPackDAO {
 
-    private TranslationPackRepository translationPackRepository;
+    private final TranslationPackRepository translationPackRepository;
 
     @Autowired
     public TranslationPackDAOImpl(TranslationPackRepository translationPackRepository) {

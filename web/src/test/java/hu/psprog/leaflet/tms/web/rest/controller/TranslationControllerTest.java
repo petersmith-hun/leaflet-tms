@@ -1,18 +1,20 @@
 package hu.psprog.leaflet.tms.web.rest.controller;
 
+import hu.psprog.leaflet.bridge.client.domain.error.ErrorMessageResponse;
+import hu.psprog.leaflet.bridge.client.domain.error.ValidationErrorMessageListResponse;
+import hu.psprog.leaflet.bridge.client.domain.error.ValidationErrorMessageResponse;
+import hu.psprog.leaflet.tms.core.entity.TranslationPack;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackCreationException;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
 import hu.psprog.leaflet.tms.core.service.TranslationManagementService;
-import hu.psprog.leaflet.tms.web.exception.model.ErrorMessageResponse;
-import hu.psprog.leaflet.tms.web.exception.model.ValidationErrorMessageListResponse;
-import hu.psprog.leaflet.tms.web.exception.model.ValidationErrorMessageResponse;
-import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
+import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -21,6 +23,7 @@ import org.springframework.validation.FieldError;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -39,12 +42,16 @@ public class TranslationControllerTest {
     private static final UUID PACK_ID = UUID.randomUUID();
     private static final URI EXPECTED_LOCATION = URI.create("/translations/" + PACK_ID);
     private static final List<String> PACKS = Collections.singletonList("pack1");
-    private static final TranslationPackCreationRequest TRANSLATION_PACK_CREATION_REQUEST = new TranslationPackCreationRequest();
-    private static final TranslationPack TRANSLATION_PACK = TranslationPack.getPackBuilder().withId(PACK_ID).build();
+    private static final TranslationPackCreationRequest TRANSLATION_PACK_CREATION_REQUEST = TranslationPackCreationRequest.getBuilder().build();
+    private static final TranslationPack NEW_TRANSLATION_PACK = TranslationPack.builder().build();
+    private static final TranslationPack TRANSLATION_PACK = TranslationPack.builder().id(PACK_ID).build();
+    private static final TranslationPackMetaInfo TRANSLATION_PACK_META_INFO = TranslationPackMetaInfo.getBuilder().withId(PACK_ID).build();
+    private static final hu.psprog.leaflet.translation.api.domain.TranslationPack API_TRANSLATION_PACK =
+            hu.psprog.leaflet.translation.api.domain.TranslationPack.getBuilder().withId(PACK_ID).build();
     private static final String VIOLATED_FIELD = "field1";
     private static final String DEFAULT_MESSAGE = "violation message";
     private static final ValidationErrorMessageListResponse EXPECTED_VALIDATION_ERROR_BODY = ValidationErrorMessageListResponse.getBuilder()
-            .withValidation(Collections.singletonList(ValidationErrorMessageResponse.getExtendedBuilder()
+            .withValidation(Collections.singletonList(ValidationErrorMessageResponse.getBuilder()
                     .withField(VIOLATED_FIELD)
                     .withMessage(DEFAULT_MESSAGE)
                     .build()))
@@ -52,6 +59,9 @@ public class TranslationControllerTest {
 
     @Mock
     private TranslationManagementService translationManagementService;
+
+    @Mock
+    private ConversionService conversionService;
 
     @Mock
     private BindingResult bindingResult;
@@ -62,34 +72,47 @@ public class TranslationControllerTest {
     @Test
     public void shouldRetrievePacks() {
 
+        given(translationManagementService.retrieveLatestEnabledPacks(PACKS)).willReturn(Set.of(TRANSLATION_PACK));
+        given(conversionService.convert(TRANSLATION_PACK, hu.psprog.leaflet.translation.api.domain.TranslationPack.class)).willReturn(API_TRANSLATION_PACK);
+
         // when
         ResponseEntity<?> result = translationController.retrievePacks(PACKS);
 
         // then
         verify(translationManagementService).retrieveLatestEnabledPacks(PACKS);
         assertThat(result.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(result.getBody(), equalTo(Set.of(API_TRANSLATION_PACK)));
     }
 
     @Test
     public void shouldListStoredPacks() {
 
+        // given
+        given(translationManagementService.retrieveAllTranslationPack()).willReturn(List.of(TRANSLATION_PACK));
+        given(conversionService.convert(TRANSLATION_PACK, TranslationPackMetaInfo.class)).willReturn(TRANSLATION_PACK_META_INFO);
+
         // when
         ResponseEntity<?> result = translationController.listStoredPacks();
 
         // then
-        verify(translationManagementService).retrievePackMetaInfo();
+        verify(translationManagementService).retrieveAllTranslationPack();
         assertThat(result.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(result.getBody(), equalTo(List.of(TRANSLATION_PACK_META_INFO)));
     }
 
     @Test
     public void shouldGetPackByID() throws TranslationPackNotFoundException {
 
+        // given
+        given(translationManagementService.getPack(PACK_ID)).willReturn(TRANSLATION_PACK);
+        given(conversionService.convert(TRANSLATION_PACK, hu.psprog.leaflet.translation.api.domain.TranslationPack.class)).willReturn(API_TRANSLATION_PACK);
+
         // when
         ResponseEntity<?> result = translationController.getPackByID(PACK_ID);
 
         // then
-        verify(translationManagementService).getPack(PACK_ID);
         assertThat(result.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(result.getBody(), equalTo(API_TRANSLATION_PACK));
     }
 
     @Test
@@ -97,14 +120,16 @@ public class TranslationControllerTest {
 
         // given
         given(bindingResult.hasErrors()).willReturn(false);
-        given(translationManagementService.createPack(TRANSLATION_PACK_CREATION_REQUEST)).willReturn(TRANSLATION_PACK);
+        given(conversionService.convert(TRANSLATION_PACK_CREATION_REQUEST, TranslationPack.class)).willReturn(NEW_TRANSLATION_PACK);
+        given(translationManagementService.createPack(NEW_TRANSLATION_PACK)).willReturn(TRANSLATION_PACK);
+        given(conversionService.convert(TRANSLATION_PACK, hu.psprog.leaflet.translation.api.domain.TranslationPack.class)).willReturn(API_TRANSLATION_PACK);
 
         // when
         ResponseEntity<?> result = translationController.createTranslationPack(TRANSLATION_PACK_CREATION_REQUEST, bindingResult);
 
         // then
         assertThat(result.getStatusCode(), equalTo(HttpStatus.CREATED));
-        assertThat(result.getBody(), equalTo(TRANSLATION_PACK));
+        assertThat(result.getBody(), equalTo(API_TRANSLATION_PACK));
         assertThat(result.getHeaders().getLocation(), equalTo(EXPECTED_LOCATION));
     }
 
@@ -128,13 +153,14 @@ public class TranslationControllerTest {
 
         // given
         given(translationManagementService.changeStatus(PACK_ID)).willReturn(TRANSLATION_PACK);
+        given(conversionService.convert(TRANSLATION_PACK, hu.psprog.leaflet.translation.api.domain.TranslationPack.class)).willReturn(API_TRANSLATION_PACK);
 
         // when
         ResponseEntity<?> result = translationController.changePackStatus(PACK_ID);
 
         // then
         assertThat(result.getStatusCode(), equalTo(HttpStatus.CREATED));
-        assertThat(result.getBody(), equalTo(TRANSLATION_PACK));
+        assertThat(result.getBody(), equalTo(API_TRANSLATION_PACK));
         assertThat(result.getHeaders().getLocation(), equalTo(EXPECTED_LOCATION));
     }
 
@@ -157,18 +183,18 @@ public class TranslationControllerTest {
 
         // then
         assertThat(result.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
-        assertThat(result.getBody().getMessage(), equalTo(String.format("Requested translation pack [%s] not found", PACK_ID)));
+        assertThat(result.getBody().message(), equalTo(String.format("Requested translation pack [%s] not found", PACK_ID)));
     }
 
     @Test
     public void shouldHandleCreationException() {
 
         // when
-        ResponseEntity<ErrorMessageResponse> result = translationController.creationExceptionHandler(new TranslationPackCreationException(TRANSLATION_PACK_CREATION_REQUEST));
+        ResponseEntity<ErrorMessageResponse> result = translationController.creationExceptionHandler(new TranslationPackCreationException(NEW_TRANSLATION_PACK));
 
         // then
         assertThat(result.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-        assertThat(result.getBody().getMessage(), equalTo(String.format("Failed to create translation pack for request [%s]", TRANSLATION_PACK_CREATION_REQUEST)));
+        assertThat(result.getBody().message(), equalTo(String.format("Failed to create translation pack for request [%s]", NEW_TRANSLATION_PACK)));
     }
 
     @Test
@@ -179,6 +205,6 @@ public class TranslationControllerTest {
 
         // then
         assertThat(result.getStatusCode(), equalTo(HttpStatus.INTERNAL_SERVER_ERROR));
-        assertThat(result.getBody().getMessage(), equalTo("Unexpected exception occurred"));
+        assertThat(result.getBody().message(), equalTo("Unexpected exception occurred"));
     }
 }
