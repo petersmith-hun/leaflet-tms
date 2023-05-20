@@ -1,10 +1,8 @@
 package hu.psprog.leaflet.tms.core.service;
 
+import hu.psprog.leaflet.tms.core.entity.TranslationPack;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackCreationException;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
-import hu.psprog.leaflet.translation.api.domain.TranslationPack;
-import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
-import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
 
 import java.util.List;
 import java.util.Set;
@@ -29,11 +27,11 @@ public interface TranslationManagementService {
     Set<TranslationPack> retrieveLatestEnabledPacks(List<String> packs);
 
     /**
-     * Retrieves meta information of all available translation packs.
+     * Retrieves all available translation pack.
      *
      * @return List of {@link TranslationPack} objects
      */
-    List<TranslationPackMetaInfo> retrievePackMetaInfo();
+    List<TranslationPack> retrieveAllTranslationPack();
 
     /**
      * Retrieves pack identified by given ID as {@link UUID}.
@@ -51,7 +49,7 @@ public interface TranslationManagementService {
      * @return created {@link TranslationPack}
      * @throws TranslationPackCreationException if translation pack could not be created
      */
-    TranslationPack createPack(TranslationPackCreationRequest translationPackCreationRequest) throws TranslationPackCreationException;
+    TranslationPack createPack(TranslationPack translationPackCreationRequest) throws TranslationPackCreationException;
 
     /**
      * Changes status (enabled/disabled) of the translation pack identified by given ID.

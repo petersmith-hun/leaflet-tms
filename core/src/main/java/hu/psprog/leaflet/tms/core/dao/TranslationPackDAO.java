@@ -1,6 +1,6 @@
 package hu.psprog.leaflet.tms.core.dao;
 
-import hu.psprog.leaflet.translation.api.domain.TranslationPack;
+import hu.psprog.leaflet.tms.core.entity.TranslationPack;
 
 import java.util.List;
 import java.util.UUID;

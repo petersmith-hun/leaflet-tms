@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.tms.core.dao.impl;
 
+import hu.psprog.leaflet.tms.core.entity.TranslationPack;
 import hu.psprog.leaflet.tms.core.repository.TranslationPackRepository;
-import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 public class TranslationPackDAOImplTest {
 
     private static final UUID PACK_ID = UUID.randomUUID();
-    private static final TranslationPack TRANSLATION_PACK = TranslationPack.getPackBuilder().withId(PACK_ID).build();
+    private static final TranslationPack TRANSLATION_PACK = TranslationPack.builder().id(PACK_ID).build();
 
     @Mock
     private TranslationPackRepository translationPackRepository;

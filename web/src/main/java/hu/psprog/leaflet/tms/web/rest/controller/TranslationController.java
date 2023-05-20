@@ -1,17 +1,19 @@
 package hu.psprog.leaflet.tms.web.rest.controller;
 
+import hu.psprog.leaflet.bridge.client.domain.error.ErrorMessageResponse;
+import hu.psprog.leaflet.bridge.client.domain.error.ValidationErrorMessageListResponse;
+import hu.psprog.leaflet.bridge.client.domain.error.ValidationErrorMessageResponse;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackCreationException;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
 import hu.psprog.leaflet.tms.core.service.TranslationManagementService;
-import hu.psprog.leaflet.tms.web.exception.model.ErrorMessageResponse;
-import hu.psprog.leaflet.tms.web.exception.model.ValidationErrorMessageListResponse;
-import hu.psprog.leaflet.tms.web.exception.model.ValidationErrorMessageResponse;
 import hu.psprog.leaflet.translation.api.domain.TranslationPack;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -23,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
@@ -50,11 +51,13 @@ public class TranslationController {
 
     static final String PATH_TRANSLATIONS = "/translations";
 
-    private TranslationManagementService translationManagementService;
+    private final TranslationManagementService translationManagementService;
+    private final ConversionService conversionService;
 
     @Autowired
-    public TranslationController(TranslationManagementService translationManagementService) {
+    public TranslationController(TranslationManagementService translationManagementService, ConversionService conversionService) {
         this.translationManagementService = translationManagementService;
+        this.conversionService = conversionService;
     }
 
     /**
@@ -69,8 +72,13 @@ public class TranslationController {
     @RequestMapping(method = RequestMethod.GET, params = PARAMETER_PACKS)
     public ResponseEntity<Set<TranslationPack>> retrievePacks(@RequestParam(value = PARAMETER_PACKS) List<String> packs) {
 
+        var translationPacks = translationManagementService.retrieveLatestEnabledPacks(packs)
+                .stream()
+                .map(translationPack -> conversionService.convert(translationPack, TranslationPack.class))
+                .collect(Collectors.toSet());
+
         return ResponseEntity
-                .ok(translationManagementService.retrieveLatestEnabledPacks(packs));
+                .ok(translationPacks);
     }
 
     /**
@@ -82,8 +90,13 @@ public class TranslationController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<TranslationPackMetaInfo>> listStoredPacks() {
 
+        var translationPacks = translationManagementService.retrieveAllTranslationPack()
+                .stream()
+                .map(translationPack -> conversionService.convert(translationPack, TranslationPackMetaInfo.class))
+                .toList();
+
         return ResponseEntity
-                .ok(translationManagementService.retrievePackMetaInfo());
+                .ok(translationPacks);
     }
 
     /**
@@ -97,8 +110,10 @@ public class TranslationController {
     @RequestMapping(method = RequestMethod.GET, path = PATH_PACK_ID)
     public ResponseEntity<TranslationPack> getPackByID(@PathVariable(PARAMETER_PACK_ID) UUID packID) throws TranslationPackNotFoundException {
 
+        var translationPack = translationManagementService.getPack(packID);
+
         return ResponseEntity
-                .ok(translationManagementService.getPack(packID));
+                .ok(conversionService.convert(translationPack, TranslationPack.class));
     }
 
     /**
@@ -120,10 +135,12 @@ public class TranslationController {
                     .badRequest()
                     .body(buildValidationErrorMessage(translationPackCreationRequest, bindingResult));
         } else {
-            TranslationPack translationPack = translationManagementService.createPack(translationPackCreationRequest);
+            var translationPack = conversionService.convert(translationPackCreationRequest, hu.psprog.leaflet.tms.core.entity.TranslationPack.class);
+            var savedTranslationPack = translationManagementService.createPack(translationPack);
+
             responseEntity = ResponseEntity
-                    .created(createURI(translationPack))
-                    .body(translationPack);
+                    .created(createURI(savedTranslationPack))
+                    .body(conversionService.convert(savedTranslationPack, TranslationPack.class));
         }
 
         return responseEntity;
@@ -140,11 +157,11 @@ public class TranslationController {
     @RequestMapping(method = RequestMethod.PUT, path = PATH_STATUS)
     public ResponseEntity<TranslationPack> changePackStatus(@PathVariable(PARAMETER_PACK_ID) UUID packID) throws TranslationPackNotFoundException {
 
-        TranslationPack translationPack = translationManagementService.changeStatus(packID);
+        var translationPack = translationManagementService.changeStatus(packID);
 
         return ResponseEntity
                 .created(createURI(translationPack))
-                .body(translationPack);
+                .body(conversionService.convert(translationPack, TranslationPack.class));
     }
 
     /**
@@ -220,7 +237,7 @@ public class TranslationController {
 
         return ValidationErrorMessageListResponse.getBuilder()
                 .withValidation(bindingResult.getFieldErrors().stream()
-                        .map(fieldError -> ValidationErrorMessageResponse.getExtendedBuilder()
+                        .map(fieldError -> ValidationErrorMessageResponse.getBuilder()
                                 .withField(fieldError.getField())
                                 .withMessage(fieldError.getDefaultMessage())
                                 .build())
@@ -242,7 +259,7 @@ public class TranslationController {
                 .build();
     }
 
-    private URI createURI(TranslationPack translationPack) {
-        return URI.create(PATH_TRANSLATIONS + "/" + translationPack.getId());
+    private URI createURI(hu.psprog.leaflet.tms.core.entity.TranslationPack translationPack) {
+        return URI.create(String.format("%s/%s", PATH_TRANSLATIONS, translationPack.getId()));
     }
 }

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>tms</artifactId>
         <groupId>hu.psprog.leaflet</groupId>
-        <version>1.5.1-dev</version>
+        <version>1.6.0-dev</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -36,6 +36,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>tms-rest-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>bridge-api</artifactId>
         </dependency>
     </dependencies>
 

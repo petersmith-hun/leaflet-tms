@@ -1,18 +1,15 @@
 package hu.psprog.leaflet.tms.core.service.impl;
 
 import hu.psprog.leaflet.tms.core.dao.TranslationPackDAO;
+import hu.psprog.leaflet.tms.core.entity.TranslationPack;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackCreationException;
 import hu.psprog.leaflet.tms.core.exception.TranslationPackNotFoundException;
-import hu.psprog.leaflet.translation.api.domain.TranslationPack;
-import hu.psprog.leaflet.translation.api.domain.TranslationPackCreationRequest;
-import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.convert.ConversionService;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -44,8 +41,6 @@ public class TranslationManagementServiceImplTest {
     private static final Locale LANGUAGE_HU = Locale.forLanguageTag("HU");
     private static final UUID PACK_ID = UUID.randomUUID();
 
-    private static final TranslationPackCreationRequest TRANSLATION_PACK_CREATION_REQUEST = new TranslationPackCreationRequest();
-
     private static final TranslationPack TRANSLATION_PACK_SHARED_EN_LATEST_DISABLED = prepareTranslationPack(PACK_SHARED, Locale.ENGLISH, prepareTimestamp(27), false);
     private static final TranslationPack TRANSLATION_PACK_SHARED_EN_PREVIOUS_DISABLED = prepareTranslationPack(PACK_SHARED, Locale.ENGLISH, prepareTimestamp(25), false);
     private static final TranslationPack TRANSLATION_PACK_SHARED_EN_FIRST_ENABLED = prepareTranslationPack(PACK_SHARED, Locale.ENGLISH, prepareTimestamp(1), true);
@@ -71,9 +66,6 @@ public class TranslationManagementServiceImplTest {
 
     @Mock
     private TranslationPackDAO translationPackDAO;
-
-    @Mock
-    private ConversionService conversionService;
 
     @InjectMocks
     private TranslationManagementServiceImpl translationManagementService;
@@ -101,10 +93,9 @@ public class TranslationManagementServiceImplTest {
 
         // given
         given(translationPackDAO.findAll()).willReturn(Collections.singletonList(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED));
-        given(conversionService.convert(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED, TranslationPackMetaInfo.class)).willReturn(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED);
 
         // when
-        List<TranslationPackMetaInfo> result = translationManagementService.retrievePackMetaInfo();
+        List<TranslationPack> result = translationManagementService.retrieveAllTranslationPack();
 
         // then
         assertThat(result, notNullValue());
@@ -143,11 +134,10 @@ public class TranslationManagementServiceImplTest {
     public void shouldCreatePack() throws TranslationPackCreationException {
 
         // given
-        given(conversionService.convert(TRANSLATION_PACK_CREATION_REQUEST, TranslationPack.class)).willReturn(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED);
         given(translationPackDAO.save(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED)).willReturn(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED);
 
         // when
-        TranslationPack result = translationManagementService.createPack(TRANSLATION_PACK_CREATION_REQUEST);
+        TranslationPack result = translationManagementService.createPack(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED);
 
         // then
         assertThat(result, equalTo(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED));
@@ -157,11 +147,10 @@ public class TranslationManagementServiceImplTest {
     public void shouldCreatePackThrowException() {
 
         // given
-        given(conversionService.convert(TRANSLATION_PACK_CREATION_REQUEST, TranslationPack.class)).willReturn(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED);
         given(translationPackDAO.save(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED)).willReturn(null);
 
         // when
-        Assertions.assertThrows(TranslationPackCreationException.class, () -> translationManagementService.createPack(TRANSLATION_PACK_CREATION_REQUEST));
+        Assertions.assertThrows(TranslationPackCreationException.class, () -> translationManagementService.createPack(TRANSLATION_PACK_APP1_EN_PREVIOUS_ENABLED));
 
         // then
         // exception expected
@@ -245,12 +234,13 @@ public class TranslationManagementServiceImplTest {
     }
 
     private static TranslationPack prepareTranslationPack(String name, Locale locale, Timestamp created, boolean enabled) {
-        return TranslationPack.getPackBuilder()
-                .withId(UUID.randomUUID())
-                .withCreated(created)
-                .withEnabled(enabled)
-                .withPackName(name)
-                .withLocale(locale)
+
+        return TranslationPack.builder()
+                .id(UUID.randomUUID())
+                .created(created)
+                .enabled(enabled)
+                .packName(name)
+                .locale(locale)
                 .build();
     }
 }

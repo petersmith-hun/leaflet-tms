@@ -1,6 +1,6 @@
-package hu.psprog.leaflet.tms.core.conversion;
+package hu.psprog.leaflet.tms.web.conversion;
 
-import hu.psprog.leaflet.translation.api.domain.TranslationPack;
+import hu.psprog.leaflet.tms.core.entity.TranslationPack;
 import hu.psprog.leaflet.translation.api.domain.TranslationPackMetaInfo;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ public class TranslationPackToMetaInfoConverter implements Converter<Translation
 
     @Override
     public TranslationPackMetaInfo convert(TranslationPack source) {
-        return TranslationPackMetaInfo.getMetaInfoBuilder()
+        return TranslationPackMetaInfo.getBuilder()
                 .withId(source.getId())
                 .withPackName(source.getPackName())
                 .withLocale(source.getLocale())
