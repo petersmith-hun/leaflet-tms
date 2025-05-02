@@ -1,0 +1,39 @@
+domino:
+  deployments:
+    tms:
+      source:
+        type: DOCKER
+        home: "[dsm:common.home.docker]"
+        resource: tms
+      target:
+        hosts:
+          - psproghu
+      execution:
+        command-name: app_tms
+        via: STANDARD
+        args:
+          ports:
+            8086: 8086
+          network-mode: host
+          environment:
+            APP_ARGS: |
+              --spring.profiles.active=production
+              --spring.config.location=/opt/tms/appconfig_tms.yml
+          volumes:
+            "[dsm:volume.logs]": "/opt/tms/logs:rw"
+            "[dsm:volume.config.tms]": "/opt/tms/appconfig_tms.yml:ro"
+            "/etc/timezone": "/etc/timezone:ro"
+            "/etc/localtime": "/etc/localtime:ro"
+          restart-policy: unless-stopped
+      health-check:
+        enabled: true
+        delay: 20 seconds
+        timeout: 2 seconds
+        max-attempts: 3
+        endpoint: "http://127.0.0.1:8086/tms/actuator/health"
+      info:
+        enabled: true
+        endpoint: "http://127.0.0.1:8086/tms/actuator/info"
+        field-mapping:
+          abbreviation: $.app.abbreviation
+          version: $.build.version
