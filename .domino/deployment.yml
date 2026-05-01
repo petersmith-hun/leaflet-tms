@@ -19,8 +19,8 @@ domino:
             APP_ARGS: |
               --spring.profiles.active=production
               --spring.config.location=/opt/tms/appconfig_tms.yml
-              --spring.mongodb.username="[dsm:apps.tms.mongo.username]"
-              --spring.mongodb.password="[dsm:apps.tms.mongo.password]"
+              --spring.mongodb.username=[dsm:apps.tms.mongo.username]
+              --spring.mongodb.password=[dsm:apps.tms.mongo.password]
           volumes:
             "[dsm:volume.logs]": "/opt/tms/logs:rw"
             "[dsm:volume.config.tms]": "/opt/tms/appconfig_tms.yml:ro"
