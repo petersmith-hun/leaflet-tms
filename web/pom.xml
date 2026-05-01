@@ -5,7 +5,7 @@
     <parent>
         <artifactId>tms</artifactId>
         <groupId>hu.psprog.leaflet</groupId>
-        <version>1.7.1-dev</version>
+        <version>1.8.0-dev</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -26,12 +26,8 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-resource-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-jose</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -59,7 +55,6 @@
                         <argument>--spring.profiles.active=${spring.profiles.active}</argument>
                         <argument>--spring.config.location=${spring.config.location}</argument>
                     </arguments>
-                    <executable>true</executable>
                 </configuration>
                 <executions>
                     <execution>
