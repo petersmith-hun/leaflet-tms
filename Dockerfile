@@ -4,7 +4,7 @@ ARG APP_USER=leaflet
 ARG APP_HOME=/opt/tms
 ARG APP_EXECUTABLE=leaflet-tms-exec.jar
 ENV ENV_APP_EXECUTABLE=$APP_EXECUTABLE
-ENV JAVA_OPTS=-Xmx64M
+ENV JAVA_OPTS="-Xmx64M"
 
 RUN addgroup --system --gid 1000 $APP_USER
 RUN adduser --system --no-create-home --gid 1000 --uid 1000 $APP_USER
